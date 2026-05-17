@@ -61,20 +61,34 @@ class Expense
 
             }
 
+
+            
+
             // Check if it exceeds the set monthly budget
             foreach ($this->budget as $key => $value) {
                 if (array_key_exists($month, $value)) {
                     if (($options['amount'] + $this->getTotalForMonth(date('n'))) > $value[$month]) {
-                        return "Warning, you have exceeded this month's budget of $" . $value[$month] . " (now " .  $this->getTotalForMonth(date('n')) . ")";
+                        echo "Warning, you have exceeded this month's budget of $" . $value[$month] . " (now " .  $this->getTotalForMonth(date('n')) + ($options['amount'] + $this->getTotalForMonth(date('n'))). ")";
                     }
                 }
             }
 
+            
             // Add to json
             $userExpense = ["id" => $id, "description" => $options["description"], "amount" => $options["amount"], "date" => date("Y/m/d")];
             $this->current[] = $userExpense;
-            file_put_contents($this->expenseFile, json_encode($this->current, JSON_PRETTY_PRINT));
-            return "Expense created successfully (ID:{$id})";
+            
+            $jsonData = json_encode($this->current, JSON_PRETTY_PRINT);
+            if ($jsonData === false) {
+                throw new Exception("\nFailed to encode expense data to JSON");
+            }
+            
+            $written = file_put_contents($this->expenseFile, $jsonData);
+            if ($written === false) {
+                throw new Exception("\nFailed to write to expense file. Check file permissions and path.");
+            }
+            
+            return "\nExpense created successfully (ID:{$id})";
         } catch (Exception $e) {
             return $e->getMessage();
         }
@@ -195,11 +209,11 @@ class Expense
 
             if (array_key_exists('month', $options)) {
 
-                if ($options['month'] > 12 || $options['month'] < 1) {
+                if ((!in_array($options['month'], $this->months))) {
                     throw new Exception("\nMonth isn't valid");
                 }
 
-                return "Total expense for {$this->months[$options['month'] - 1]}: $" . $this->getTotalForMonth($options);
+                return "Total expense for {$options['month']}: $" . $this->getTotalForMonth($options);
 
             } else {
 
@@ -274,7 +288,7 @@ class Expense
         foreach ($this->current as $current) {
 
             if (is_array($options)) {
-                if (date('m', strtotime($current['date'])) == $options['month']) {
+                if (date('F', strtotime($current['date'])) == $options['month']) {
                     $sum += $current['amount'];
 
                 }
@@ -341,12 +355,12 @@ class Expense
         echo "                   Options: --month='MonthName' --budget=number\n\n";
         echo "  export-budget    Export all expenses to CSV file\n\n";
         echo "Examples:\n";
-        echo "  php expense-tracker.php -a add --description='Groceries' --amount=50\n";
+        echo "  php expense-tracker.php -a add --description Groceries --amount 50\n";
         echo "  php expense-tracker.php -a list\n";
-        echo "  php expense-tracker.php -a summary --month=5\n";
-        echo "  php expense-tracker.php -a set-budget --month='May' --budget=500\n";
-        echo "  php expense-tracker.php -a update --id=0 --description='Gas' --amount=40\n";
-        echo "  php expense-tracker.php -a delete --id=0\n";
+        echo "  php expense-tracker.php -a summary --month May\n";
+        echo "  php expense-tracker.php -a set-budget --month May --budget 500\n";
+        echo "  php expense-tracker.php -a update --id 0 --description Gas --amount=40\n";
+        echo "  php expense-tracker.php -a delete --id 0\n";
         echo "\n";
     }
 

@@ -114,7 +114,7 @@ Expense Tracker/
 
 1. Add an expense:
    ```bash
-   php expense-tracker.php -a add --description='Coffee' --amount=5
+   php expense-tracker.php -a add --description Coffee --amount 5
    ```
 
 2. View your expenses:
@@ -124,12 +124,12 @@ Expense Tracker/
 
 3. Set a monthly budget:
    ```bash
-   php expense-tracker.php -a set-budget --month='May' --budget=500
+   php expense-tracker.php -a set-budget --monthM May --budget 500
    ```
 
 4. Check your spending:
    ```bash
-   php expense-tracker.php -a summary --month=5
+   php expense-tracker.php -a summary --month May
    ```
 
 5. Export for analysis:
