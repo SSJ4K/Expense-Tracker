@@ -124,7 +124,7 @@ Expense Tracker/
 
 3. Set a monthly budget:
    ```bash
-   php expense-tracker.php -a set-budget --monthM May --budget 500
+   php expense-tracker.php -a set-budget --month May --budget 500
    ```
 
 4. Check your spending:
